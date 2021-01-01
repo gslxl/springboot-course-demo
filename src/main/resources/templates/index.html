@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>新增疫情数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+    <script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+    <script>
+        layui.use('element', function(){
+            var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+            //监听导航点击
+            element.on('nav(demo)', function(elem){
+                //console.log(elem)
+                layer.msg(elem.text());
+            });
+        });
+    </script>
+</head>
+<body>
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 40px;">
+    <legend>新冠疫情数据</legend>
+</fieldset>
+
+<ul class="layui-nav layui-bg-green">
+    <li class="layui-nav-item layui-this"><a href="javascript:;" data-src="/data/detail"  target="_top" >疫情列表</a></li>
+    <li class="layui-nav-item"><a href="javascript:;" data-src="/data/initStatictics" target="_top" >疫情统计</a></li>
+    <!--<li class="layui-nav-item"><a href="javascript:;" data-src="/toclasslist" target="_top">疫情地图</a></li>
+    <li class="layui-nav-item"><a href="javascript:;" data-src="/userlist2" target="_top">疫情统计</a></li>-->
+</ul>
+<div class="main_right">
+    <iframe frameborder="0" scrolling="yes" style="width: 100%" src="/data/detail" id="aa">
+
+    </iframe>
+</div>
+</body>
+<script>
+    $(function(){
+        //获取src值
+        $(".layui-nav-item a").on("click",function(){
+            var address =$(this).attr("data-src");
+            $("iframe").attr("src",address);
+        });
+        //一下代码是根据窗口高度设置iframe的高度
+        var frame = $("#aa");
+
+        var frameheight = $(window).height();
+        console.log(frameheight);
+        frame.css("height",frameheight);
+    });
+</script>
+</html>

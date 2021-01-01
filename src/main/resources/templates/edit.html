@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>编辑</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layuimini/lib/layui-v2.5.5/css/layui.css" media="all">
+    <link rel="stylesheet" href="../layuimini/css/public.css" media="all">
+    <script src="../layuimini/lib/layui-v2.5.5/layui.js" charset="utf-8"></script>
+    <script src="../layuimini/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+</head>
+<body>
+<blockquote class="layui-elem-quote layui-text">
+    <h2>修改信息</h2>
+</blockquote>
+<form class="layui-form" id="editform"  action="">
+<!--    <div class="layui-form-item">-->
+<!--        <label class="layui-form-label">编号</label>-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="number" name="id" lay-verify="id" autocomplete="off" class="layui-input" id="id" readonly>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="layui-form-item">
+        <label class="layui-form-label">省份</label>
+        <div class="layui-input-block">
+            <input type="text" name="prov" lay-verify="prov" autocomplete="off" placeholder="请输入省份名称"
+                   class="layui-input" id="prov">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">日期</label>
+        <div class="layui-input-block">
+            <input type="text" name="date" lay-verify="date" autocomplete="off" placeholder="请输入日期"
+                   class="layui-input" id="date">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">累计确诊</label>
+        <div class="layui-input-block">
+            <input type="number" name="cumulative" lay-verify="cumulative" autocomplete="off" placeholder="请输入累计确诊"
+                   class="layui-input" id="cumulative">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">治愈</label>
+        <div class="layui-input-block">
+            <input type="number" name="cure" lay-verify="cure" autocomplete="off" placeholder="请输入治愈人数"
+                   class="layui-input" id="cure">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">死亡</label>
+        <div class="layui-input-block">
+            <input type="number" name="deadth" lay-verify="deadth" autocomplete="off" placeholder="请输入死亡人数"
+                   class="layui-input" id="deadth">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">新增</label>
+        <div class="layui-input-block">
+            <input type="number" name="increase" lay-verify="increase" autocomplete="off" placeholder="请输入新增人数"
+                   class="layui-input" id="increase">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" lay-filter="edit">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+
+    layui.use(['form', 'layer', 'jquery'], function () {
+        $ = layui.jquery;
+        var form = layui.form,
+            layer = layui.layer,
+            layedit = layui.layedit,
+            laydate = layui.laydate;
+        var parent_json = eval('(' + parent.json + ')');
+        //$("input[name='id']").val(parent_json.id);
+        $("input[name='prov']").val(parent_json.prov);
+        $("input[name='date']").val(parent_json.date);
+        // $("input[name='cumulative']").val(parent_json.cumulative);
+        // $("input[name='cure']").val(parent_json.cure);
+        // $("input[name='deadth']").val(parent_json.deadth);
+        // $("input[name='increase']").val(parent_json.increase);
+
+        form.render();//刷新
+
+        //监听提交
+        form.on('submit(edit)', function (data) {
+            //获取文本框的值
+            var fields = $('#editform').serializeArray();
+            var obj = {}; //声明一个对象
+            $.each(fields, function(index, field) {
+                obj[field.name] = field.value; //通过变量，将属性值，属性一起放到对象中
+            })
+            $.ajax({
+                type: 'post',
+                url: '/data/edit',
+                async: true,
+                contentType: 'application/json',
+                datype: "json",
+                data: JSON.stringify(obj),
+                success: function (data) {
+                    layer.alert('修改成功', {icon: 6, title: '提示', time: 1500})
+                    setTimeout(function () {
+                        window.parent.location.reload();
+                        // window.location.href="index.html";
+                    }, 1500);
+                },
+                error: function () {
+                    layer.alert('请求失败，系统错误', {icon: 7, title: '提示', time: 1000})
+                }
+
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>新增疫情数据</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!--css -->
+    <link rel="stylesheet"  th:href="@{/layui/css/layui.css}"/>
+    <!-- Layui Js -->
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-1.10.2.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/echarts.min.js}"></script>
+
+
+
+</head>
+<body>
+<!--<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>疫情列表</legend>
+</fieldset>-->
+<div class="layui-row">
+    <form class="layui-form" id="searchForm" action="">
+    <div class="demoTable">
+ <!--       地区名称：
+        <div class="layui-inline">
+            <select name="area" id="area" class="layui-input">
+                <option value="北京">北京</option>
+                <option value="全国">全国</option>
+            </select>
+        </div>-->
+
+        地区名称：
+            <div class="layui-inline layui-form" >
+                <select name="area" class="layui-input" id="area" lay-filter="area">
+                    <option value="北京">北京</option>
+                    <option value="全国">全国</option>
+                </select>
+            </div>
+        开始时间：
+        <div class="layui-inline">
+            <input type="text" name="starTime" class="layui-input" id="starTime" placeholder="开始时间(修改时间)">
+        </div>
+        结束时间：
+        <div class="layui-inline">
+            <input type="text" name="endTime" class="layui-input" id="endTime" placeholder="结束时间(修改时间)">
+        </div>
+        <button class="layui-btn" type="submit" lay-submit="" id="search" lay-filter="search">搜索</button>
+ <!--       <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button  class="layui-btn" lay-submit="" lay-filter="search">提交</button>
+            </div>
+        </div>-->
+    </div>
+    </form>
+</div>
+
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 1200px;height:500px;"></div>
+<script>
+
+    //var area='北京';
+
+    layui.use(['form', 'laydate'], function() {
+        var laydate = layui.laydate,
+            form = layui.form;
+
+
+        form.on('select(area)', function (data) {
+
+            area=data.elem[data.elem.selectedIndex].text;
+            $("#area").find("option[text='"+area+"']").attr("selected",true);
+            //重新加载layui的表单
+           form.render("select")
+        });
+
+        //常规用法
+        laydate.render({
+            elem: '#starTime'
+            ,theme: '#393D49'
+        });
+        laydate.render({
+            elem: '#endTime'
+            ,theme: '#393D49'
+        });
+
+
+        form.on('submit(search)', function (data) {
+
+            getData(option);
+
+            return false;
+
+        });
+
+        //form.render();
+    });
+
+/*    $("#search").click(function () {
+        getData(option);
+    });*/
+
+    // 指定图表的配置项和数据
+    var option = {
+        title: {
+            text: '疫情趋势'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {
+            data: ['治愈','死亡','累计','新增']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        toolbox: {
+            feature: {
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            name: '温度',
+            type: 'bar',
+            data: [5, 20, 36, 10, 10, 20]
+        }]
+    };
+    $(function(){
+        getData(option);
+
+
+    });
+
+    // 使用刚指定的配置项和数据显示图表。
+    //myChart.setOption(option);
+
+
+    function getData(option){
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById("main"));
+        var fields = $('#searchForm').serializeArray();
+        var obj = {}; //声明一个对象
+        $.each(fields, function(index, field) {
+            obj[field.name] = field.value; //通过变量，将属性值，属性一起放到对象中
+        });
+        //alert(obj.area)
+        //通过Ajax获取数据
+        $.ajax({
+            type : "post",
+            async : false, //同步执行
+            url : "getData",
+            contentType: 'application/json',
+            data : JSON.stringify(obj),
+            dataType : "json", //返回数据形式为json
+            success : function(result) {
+                if (result) {
+                    option.legend.data = result.legend;
+                    option.xAxis = result.xAxis;
+                    option.yAxis = result.yAxis;
+                    option.series = result.series;
+                    myChart.hideLoading();
+                    myChart.setOption(option);
+
+                }
+            },
+            error : function(errorMsg) {
+                alert("图表请求数据失败啦!");
+                myChart.hideLoading();
+            }
+        });
+    }
+
+</script>
+
+</body>
+</html>
